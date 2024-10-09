@@ -1,0 +1,684 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>CS180 Project 3: Face Morphing</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+    margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-transparentGray { background-color: rgba(227, 226, 224, 0); }
+.select-value-color-translucentGray { background-color: rgba(0, 0, 0, 0.06); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="119412c2-dbbd-8073-ad4b-c6e3effa0884" class="page sans"><header><img class="page-cover-image" src="https://www.celebrity-cutouts.com/wp-content/uploads/2019/11/kanye-west-smile-ceoebrity-mask.png" style="object-position:center 62.2%"/><h1 class="page-title">CS180 Project 3: Face Morphing</h1><p class="page-description"></p></header><div class="page-body"><p id="119412c2-dbbd-810e-888c-e8a664a6e7ce" class="">Name: Shuai Victor Zhou</p><p id="119412c2-dbbd-813a-8e80-ca55d2c20356" class="">SID: 3035912996</p><hr id="119412c2-dbbd-811f-aa7b-ca51e059a783"/><h2 id="119412c2-dbbd-8144-9ed3-c558104850bc" class="">Overview</h2><p id="119412c2-dbbd-818d-95e3-c88b002765b5" class="">In this project, we use correspondences (corresponding points) between faces to create morphings between them. With these morphings, we can also calculate averages of a population to find mapping of faces to the population average. Furthermore, caricatures of an individual can be generated by extrapolated from the population average.</p><hr id="119412c2-dbbd-81a3-8366-eef7e9de6b71"/><h2 id="119412c2-dbbd-8163-b9f7-e8fd9626df92" class="">Defining Correspondences</h2><p id="119412c2-dbbd-801b-bed8-c91330290a1f" class="">We first identify correspondences for images and store them within a <em>.json</em> file. With these points, we generate the Delaunay triangulations of the two images. Plotting the points on top of the images gives us the following:</p><figure id="119412c2-dbbd-8047-8455-ea6a64b206da" class="image"><a href="clooneyKanyeSimplices.png"><img style="width:640px" src="clooneyKanyeSimplices.png"/></a><figcaption>Clooney and Kanye with their correspondences</figcaption></figure><hr id="119412c2-dbbd-817b-9107-dd4e06c4f373"/><h2 id="119412c2-dbbd-8195-ba6e-f8801466e943" class="">Computing the “Mid-Way Face”</h2><p id="119412c2-dbbd-809a-a9dd-dad8ade0649e" class="">To find the “mid-way face,” we take each of the pairs of correspondences and average their positions. We then find the matrix that maps from each of the original simplices to the average simplices and then invert the matrix to find the reverse map. Using this new reverse map, we’re able to generate the mapping of each of the two photos into their average.</p><div id="11a412c2-dbbd-8076-a65f-c83c7c62b637" class="column-list"><div id="11a412c2-dbbd-8088-aa31-c1ab8b6b5021" style="width:50%" class="column"><figure id="11a412c2-dbbd-804f-956d-d38c165c2b9e" class="image"><a href="clooney.jpg"><img style="width:330.9875183105469px" src="clooney.jpg"/></a><figcaption>Original image of George Clooney</figcaption></figure></div><div id="11a412c2-dbbd-808f-b613-f6d606845fef" style="width:50%" class="column"><figure id="11a412c2-dbbd-80f4-a210-e0f9ca2a6837" class="image"><a href="kanye.jpg"><img style="width:330.9875183105469px" src="kanye.jpg"/></a><figcaption>Original image of Kanye West</figcaption></figure></div></div><div id="11a412c2-dbbd-8019-8a85-ec55671d4f45" class="column-list"><div id="11a412c2-dbbd-8069-a740-d3f06296e99d" style="width:50%" class="column"><figure id="11a412c2-dbbd-80ab-8676-e9c8e191d657" class="image"><a href="clooneyToAvg.png"><img style="width:330.9875183105469px" src="clooneyToAvg.png"/></a><figcaption>George Clooney mapped to the average simplices</figcaption></figure></div><div id="11a412c2-dbbd-80b4-93ab-fc1db117f730" style="width:50%" class="column"><figure id="11a412c2-dbbd-80fd-8cf7-e47dc407225e" class="image"><a href="kanyeToAvg.png"><img style="width:330.9875183105469px" src="kanyeToAvg.png"/></a><figcaption>Kanye West mapped to the average simplices</figcaption></figure></div></div><figure id="11a412c2-dbbd-807f-aa9f-cae26256412f" class="image"><a href="clooneyAndKanyeAveraged.png"><img style="width:384px" src="clooneyAndKanyeAveraged.png"/></a><figcaption>The average of the mapped photos</figcaption></figure><hr id="119412c2-dbbd-81cd-908a-fb010c1a0f22"/><h2 id="119412c2-dbbd-81ae-8a46-cc07c32699c7" class="">The Morph Sequence</h2><p id="11a412c2-dbbd-800b-a287-d74d55139eac" class="">In this part, we generate the sequence of an <em>im1</em> morphing into an <em>im2</em>. This is related to how we performed the mid-way face in the previous part, with the mid-way face being when our dissolve fraction and warp fraction are both 1/2. The dissolve fraction is how much of the combined image is <em>im1</em> and how much of it is <em>im2</em>, and the warp fraction is how close the “average” point that we’re mapping to is to <em>im1</em> vs <em>im2</em>. Effectively, both of these should be the same value, and it will range from 0 to 1, with 0 being when our image is just <em>im1</em> and 1 being when our image is just <em>im2</em>. For this project, we generate 60 total frames to transition from George Clooney to Kanye West, and when we combine these images into a <em>.gif</em> file, we get this result.</p><figure id="11a412c2-dbbd-8004-b51b-f0971c7d4292" class="image" style="text-align:center"><a href="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGl5dWpvZXkybjNvdmJ1ZDVmYTB0OTZ0M3l6bzd4emV0OHY4NWl0diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/HzL6ofZNJDgQ9y8Fvl/giphy.gif"><img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGl5dWpvZXkybjNvdmJ1ZDVmYTB0OTZ0M3l6bzd4emV0OHY4NWl0diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/HzL6ofZNJDgQ9y8Fvl/giphy.gif"/></a></figure><hr id="119412c2-dbbd-81c6-a521-fe95e0b83de9"/><h2 id="119412c2-dbbd-819f-9202-ff5887e3ffbc" class="">The “Mean Face” of a Population</h2><p id="11a412c2-dbbd-809a-bf4d-fc55409a2952" class="">We compute the “mean face” (average face) of a population by using the <a href="https://web.archive.org/web/20210305094647/http://www2.imm.dtu.dk/~aam/datasets/datasets.html">Danes</a> dataset of annotated faces. We take the average location of all the points to find where the correspondences are for the “average” person. With these new points, we can map each of the faces in the dataset to this “average” face. Below are some examples.</p><div id="11a412c2-dbbd-8014-928d-f22c471816c9" class="column-list"><div id="11a412c2-dbbd-8050-8f76-fc04afd9dd0a" style="width:50%" class="column"><figure id="11a412c2-dbbd-8090-94ed-d1f0d04b4881" class="image"><a href="07-1m_to_avg.png"><img style="width:331px" src="07-1m_to_avg.png"/></a></figure></div><div id="11a412c2-dbbd-80b9-bf7d-f7597db38d83" style="width:50%" class="column"><figure id="11a412c2-dbbd-8026-bcfb-c3b8b9e2ae2f" class="image"><a href="13-1m_to_avg.png"><img style="width:331px" src="13-1m_to_avg.png"/></a></figure></div></div><div id="11a412c2-dbbd-8052-96e4-c027cddf853e" class="column-list"><div id="11a412c2-dbbd-8083-afa6-d9c5aab927f4" style="width:50%" class="column"><figure id="11a412c2-dbbd-8030-89b5-f94aae684cb0" class="image"><a href="30-1f_to_avg.png"><img style="width:331px" src="30-1f_to_avg.png"/></a></figure></div><div id="11a412c2-dbbd-8034-aa98-e4bc82c61c1f" style="width:50%" class="column"><figure id="11a412c2-dbbd-808b-bdef-c096e3aabff8" class="image"><a href="35-1f_to_avg.png"><img style="width:331px" src="35-1f_to_avg.png"/></a></figure></div></div><p id="11a412c2-dbbd-801e-8771-ff0f58755fd6" class="">By adding up all of these mapped faces and averaging them, we produce the average face of this population.</p><figure id="11a412c2-dbbd-80c6-9236-e006a84c79e7" class="image"><a href="danesAverageFace.png"><img style="width:640px" src="danesAverageFace.png"/></a><figcaption>The average face of the population</figcaption></figure><p id="11a412c2-dbbd-8041-b7d0-f1e434195ad4" class="">We can also map my face to the average geometry and the average face to my geometry.</p><div id="11a412c2-dbbd-8054-a9f0-c497b97f34ed" class="column-list"><div id="11a412c2-dbbd-80ea-8fad-e244051c83ab" style="width:50%" class="column"><figure id="11a412c2-dbbd-80f8-94a4-e699239250eb" class="image"><a href="victor_to_avg.png"><img style="width:331px" src="victor_to_avg.png"/></a><figcaption>My face to the average geometry</figcaption></figure></div><div id="11a412c2-dbbd-8027-a6ac-eccf59c3b93e" style="width:50%" class="column"><figure id="11a412c2-dbbd-8037-bcb4-cdfe2b74e872" class="image"><a href="avg_to_victor.png"><img style="width:331px" src="avg_to_victor.png"/></a><figcaption>The average face to my geometry</figcaption></figure></div></div><hr id="119412c2-dbbd-81fc-8657-ec43f15d8042"/><h2 id="119412c2-dbbd-818c-87fb-efb58aecc93c" class="">Caricatures: Extrapolating from the Mean</h2><p id="119412c2-dbbd-8199-b6f1-e0e75d98f32c" class="">We can produce caricatures of ourselves by extrapolating from the mean. This is done by mapping a person’s face to the following target points:</p><figure id="11a412c2-dbbd-8097-a368-c927a51c448d" class="equation"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><div class="equation-container"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mtext>Pts</mtext><mtext>target</mtext></msub><mo>=</mo><mi>α</mi><mo>⋅</mo><msub><mtext>Pts</mtext><mtext>average</mtext></msub><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="false">)</mo><mo>⋅</mo><msub><mtext>Pts</mtext><mtext>person</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Pts}_{\text{target}} = \alpha \cdot \text{Pts}_{\text{average}} + (1 - \alpha) \cdot \text{Pts}_{\text{person}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord text"><span class="mord">Pts</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">target</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4445em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord text"><span class="mord">Pts</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">average</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord text"><span class="mord">Pts</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">person</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></span></div></figure><p id="11a412c2-dbbd-805d-94aa-cf7b826336bd" class="">When <em>α</em> is 0, we just have our regular face. Below are some results using different <em>α</em> values.</p><div id="11a412c2-dbbd-80de-8d51-c8ba0743950f" class="column-list"><div id="11a412c2-dbbd-800d-8846-cb9b5597fcac" style="width:50%" class="column"><figure id="11a412c2-dbbd-807d-9da9-d5f8233c9407" class="image"><a href="alphaNeg05.png"><img style="width:331px" src="alphaNeg05.png"/></a><figcaption><em>α</em> = -0.5</figcaption></figure></div><div id="11a412c2-dbbd-80f3-b68c-d2e9c542ec7c" style="width:50%" class="column"><figure id="11a412c2-dbbd-8089-a0b6-fbbedfd2bc8f" class="image"><a href="alphaPos00.png"><img style="width:331px" src="alphaPos00.png"/></a><figcaption><em>α</em> = 0.0</figcaption></figure></div></div><div id="11a412c2-dbbd-8073-a837-f862afe03927" class="column-list"><div id="11a412c2-dbbd-8080-a889-c50b95493de1" style="width:50%" class="column"><figure id="11a412c2-dbbd-8090-ad11-f128c15d78b3" class="image"><a href="alphaPos05.png"><img style="width:331px" src="alphaPos05.png"/></a><figcaption><em>α</em> = 0.5</figcaption></figure></div><div id="11a412c2-dbbd-80a8-880d-f68f45c33750" style="width:50%" class="column"><figure id="11a412c2-dbbd-8015-9712-f7197753c2d7" class="image"><a href="alphaPos10.png"><img style="width:331px" src="alphaPos10.png"/></a><figcaption><em>α</em> = 1.0</figcaption></figure></div></div><hr id="11a412c2-dbbd-806a-bf13-e76852caeacc"/><h2 id="11a412c2-dbbd-8031-8f4c-de87d36bfddc" class="">Bells &amp; Whistles: Myself Through the Years (MV)</h2><p id="11a412c2-dbbd-8099-9ad8-d486106bc0e0" class="">Here is a music video of myself morphing throughout the years.</p><figure id="11a412c2-dbbd-806e-bc94-c0b459cd6e50"><div class="source"><a href="https://youtube.com/embed/7oGRAfV5aLY?feature=share">https://youtube.com/embed/7oGRAfV5aLY?feature=share</a></div></figure><hr id="11a412c2-dbbd-807e-a3af-e3ac47a289ef"/><h2 id="11a412c2-dbbd-80fe-8ee5-ca243d07a0b5" class="">Bells &amp; Whistles: Face-Morphing Music Video</h2><p id="11a412c2-dbbd-8066-8996-edf3583e06d9" class="">Here is a music video of myself morphing with my peers from CS 180.</p><figure id="11a412c2-dbbd-8002-83c6-cee55af4dcc6"><div class="source"><a href="https://youtube.com/embed/33B6azJcvQE?feature=share">https://youtube.com/embed/33B6azJcvQE?feature=share</a></div></figure></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
